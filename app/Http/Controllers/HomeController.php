@@ -43,6 +43,17 @@ class HomeController extends Controller
             ->with('producto')
             ->get();
 
+        // 5. NUEVO: Últimas 10 ventas para la lista de lujo
+        $ventasRecientes = sale::with('personal') // Trae al cajero de una vez
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get();
+        $ventasSemanales = sale::selectRaw('DATE(created_at) as fecha, SUM(total) as total')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('fecha')
+            ->orderBy('fecha')
+            ->get();
+
         return view('show', compact(
             'totalVentasHoy',
             'ventasYape',
@@ -50,10 +61,11 @@ class HomeController extends Controller
             'totalVentasMes',
             'productosCriticos',
             'conteoCriticos',
-            'topProductos'
+            'topProductos',
+            'ventasRecientes',
+            'ventasSemanales' // <--- No te olvides de pasar esta
         ));
     }
-
     /**
      * Show the form for creating a new resource.
      */
