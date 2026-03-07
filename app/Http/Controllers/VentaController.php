@@ -78,11 +78,33 @@ class VentaController extends Controller
         }
     }
     public function generarTicket($id)
-{
-    // Buscamos la venta con sus detalles y productos
-    // Asegúrate de tener las relaciones configuradas en el Modelo
-    $venta = sale::with(['detalles.producto', 'personal'])->findOrFail($id);
+    {
+        // Buscamos la venta con sus detalles y productos
+        // Asegúrate de tener las relaciones configuradas en el Modelo
+        $venta = sale::with(['detalles.producto', 'personal'])->findOrFail($id);
 
-    return view('venta/ticket', compact('venta'));
-}
+        return view('venta/ticket', compact('venta'));
+    }
+    public function anular($id)
+    {
+        // 1. Buscamos la venta
+        $venta = Sale::findOrFail($id);
+
+        // 2. Buscamos los productos de esa venta (detalles)
+        $detalles = SaleDatail::where('sale_id', $id)->get();
+
+        // 3. Regresamos el stock uno por uno
+        foreach ($detalles as $item) {
+            $producto = Product::find($item->product_id);
+            if ($producto) {
+                $producto->increment('stock', $item->cantidad);
+            }
+        }
+
+        // 4. Borramos los detalles y la venta
+        SaleDatail::where('sale_id', $id)->delete();
+        $venta->delete();
+
+        return back()->with('success', 'Venta anulada. El stock ha sido restaurado.');
+    }
 }

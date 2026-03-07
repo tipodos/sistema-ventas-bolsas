@@ -8,7 +8,10 @@
         body { 
             font-family: 'Courier New', Courier, monospace; 
             width: 80mm; 
-            margin: 0; 
+            margin: 0;
+            margin-left: 10px;
+            font-family: monospace;
+            font-size: 12px;
             padding: 15px; 
             color: #000;
             background-color: #fff;
@@ -17,7 +20,7 @@
         /* Cabecera de Lujo */
         .header { text-align: center; margin-bottom: 20px; }
         .brand { 
-            font-size: 22px; 
+             
             font-weight: 900; 
             letter-spacing: 2px; 
             margin: 0;
@@ -70,10 +73,10 @@
 
     <div class="header">
         <h1 class="brand">PLASTIQUERÍA</h1>
-        <div class="subtitle">ESTILO & CALIDAD</div>
+        <div class="subtitle">CALIDAD & GARANTIA</div>
     </div>
 
-    <div class="info">
+    <div class="info">  
         <b>OPERACIÓN:</b> #{{ str_pad($venta->id, 6, '0', STR_PAD_LEFT) }}<br>
         <b>FECHA:</b> {{ $venta->created_at->format('d/m/Y H:i') }}<br>
         <b>PAGO:</b> {{ strtoupper($venta->metodo_pago ?? 'Efectivo') }}

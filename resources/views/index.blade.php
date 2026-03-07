@@ -11,10 +11,6 @@
                     <div class="card-header bg-white border-0 py-3 mt-2">
                         <div class="d-flex justify-content-between align-items-center">
                             <h4 class="fw-bold text-dark mb-0">📦 Catálogo de Productos</h4>
-                            <span class="badge bg-soft-primary text-primary px-3 py-2"
-                                style="background: #e7f1ff; border-radius: 10px;">
-                                {{ count($productos) }} ítems disponibles
-                            </span>
                         </div>
                     </div>
 
@@ -25,7 +21,7 @@
                                 <span class="input-group-text bg-white border-0"><i
                                         class="fas fa-search text-muted"></i></span>
                                 <input type="text" id="buscarProducto" class="form-control border-0 fs-5"
-                                    placeholder="Buscar por nombre o categoría..." style="box-shadow: none;">
+                                    placeholder="Buscar por nombre..." style="box-shadow: none;">
                             </div>
                         </div>
 
@@ -35,8 +31,8 @@
                                     <tr class="text-muted small uppercase">
                                         <th class="border-0">DESCRIPCIÓN</th>
                                         <th class="border-0 text-center">PRECIO</th>
-                                        <th class="border-0 text-center">STOCK</th>
-                                        <th class="border-0 text-end"></th>
+                                        <th class="border-0 text-center">CANT.</th>
+                                        <th class="border-0 text-end">ACCION</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tablaProductos">
@@ -45,31 +41,26 @@
                                             <td class="py-3">
                                                 <div class="d-flex align-items-center">
                                                     <div class="icon-shape bg-light rounded-3 me-3 d-flex align-items-center justify-content-center"
-                                                        style="width: 45px; height: 45px;">
+                                                        style="width: 40px; height: 40px;">
                                                         <i class="fas fa-box text-primary"></i>
                                                     </div>
                                                     <div>
                                                         <div class="fw-bold text-dark">{{ $p->nombre }}</div>
-                                                        <span
-                                                            class="badge bg-light text-muted fw-normal">{{ $p->categoria }}</span>
+                                                        <small class="text-muted">Stock: {{ $p->stock }}</small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td class="text-center fw-bold fs-5 text-dark">S/
-                                                {{ number_format($p->precio, 2) }}</td>
-                                            <td class="text-center">
-                                                <div class="progress"
-                                                    style="height: 6px; width: 60px; margin: 0 auto 5px auto;">
-                                                    <div class="progress-bar {{ $p->stock <= 10 ? 'bg-danger' : 'bg-success' }}"
-                                                        style="width: {{ ($p->stock / 100) * 100 }}%"></div>
-                                                </div>
-                                                <span
-                                                    class="small fw-bold {{ $p->stock <= 10 ? 'text-danger' : 'text-muted' }}">
-                                                    {{ $p->stock }} u.
-                                                </span>
+                                            <td class="text-center fw-bold text-dark">S/ {{ number_format($p->precio, 2) }}
                                             </td>
+
+                                            <td class="text-center" style="width: 100px;">
+                                                <input type="number" id="qty_{{ $p->id }}"
+                                                    class="form-control form-control-sm text-center shadow-sm"
+                                                    value="1" min="1">
+                                            </td>
+
                                             <td class="text-end">
-                                                <button class="btn btn-primary btn-sm rounded-3 shadow-sm btn-agregar px-3"
+                                                <button class="btn btn-primary btn-sm rounded-3 btn-agregar px-3"
                                                     data-id="{{ $p->id }}" data-nombre="{{ $p->nombre }}"
                                                     data-precio="{{ $p->precio }}" data-stock="{{ $p->stock }}">
                                                     <i class="fas fa-cart-plus"></i>
@@ -97,15 +88,14 @@
                                 <select id="metodoPago" class="form-select border-0 bg-light rounded-3">
                                     <option value="efectivo">💵 Efectivo</option>
                                     <option value="yape">📱 Yape / Plin</option>
-                                    <option value="tarjeta">💳 Tarjeta</option>
                                 </select>
                             </div>
                             <div class="col-6">
                                 <label class="small text-muted fw-bold mb-2">VENDEDOR</label>
                                 <select id="personal_id" class="form-select border-0 bg-light rounded-3">
-                                    <option value="">¿Quién eres?</option>
                                     @foreach ($personales as $p)
-                                        <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                        <option value="{{ $p->id }}">
+                                            {{ $p->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -113,18 +103,9 @@
 
                         <div id="carritoItems" class="mb-4"
                             style="min-height: 200px; max-height: 350px; overflow-y: auto;">
-                            <div class="text-center text-muted mt-5" id="carritoVacio">
-                                <i class="fas fa-shopping-basket fa-3x mb-3 opacity-25"></i>
-                                <p>El carrito está vacío</p>
-                            </div>
                         </div>
 
-                        <div class="bg-light p-4 rounded-4 shadow-inner mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="text-muted fw-bold">SUBTOTAL</span>
-                                <span class="text-muted fw-bold" id="subtotalLabel">S/ 0.00</span>
-                            </div>
-                            <hr class="my-2 opacity-50">
+                        <div class="bg-light p-4 rounded-4 mb-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="fw-black mb-0">TOTAL</h3>
                                 <h2 class="fw-black text-primary mb-0">S/ <span id="totalVenta">0.00</span></h2>
@@ -137,7 +118,7 @@
                                 <i class="fas fa-rocket me-2"></i> FINALIZAR Y COBRAR
                             </button>
                             <button class="btn btn-outline-danger btn-sm border-0" onclick="limpiarCarrito()">
-                                <i class="fas fa-trash-alt me-1"></i> Cancelar Pedido
+                                <i class="fas fa-trash-alt me-1"></i> Vaciar Carrito
                             </button>
                         </div>
                     </div>
@@ -148,102 +129,59 @@
     </div>
 @endsection
 
-@push('styles')
-    <style>
-        /* Estilos Piolas */
-        .product-row {
-            transition: all 0.2s ease;
-        }
-
-        .product-row:hover {
-            background-color: #f8f9ff;
-            transform: translateX(5px);
-        }
-
-        .bg-soft-primary {
-            background: #eef4ff;
-            color: #3b82f6;
-        }
-
-        .fw-black {
-            font-weight: 900;
-        }
-
-        #carritoItems::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        #carritoItems::-webkit-scrollbar-thumb {
-            background: #eee;
-            border-radius: 10px;
-        }
-
-        .ripple {
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Efecto de fila de carrito */
-        .item-carrito {
-            background: white;
-            border-bottom: 1px solid #f0f0f0;
-            padding: 12px 0;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-@endpush
-
 @push('scripts')
     <script>
-        // --- Lógica del Carrito Mejorada ---
         let carrito = [];
         let total = 0;
 
-        // Buscador instantáneo
+        // Buscador
         document.getElementById('buscarProducto').addEventListener('input', function() {
             let filtro = this.value.toLowerCase();
-            let filas = document.querySelectorAll('#tablaProductos tr');
-            filas.forEach(f => f.style.display = f.innerText.toLowerCase().includes(filtro) ? '' : 'none');
+            document.querySelectorAll('#tablaProductos tr').forEach(f => {
+                f.style.display = f.innerText.toLowerCase().includes(filtro) ? '' : 'none';
+            });
         });
 
-        // Agregar al carrito
+        // Lógica de agregar mejorada con CANTIDAD
         document.addEventListener('click', function(e) {
             let btn = e.target.closest('.btn-agregar');
             if (btn) {
+                let id = btn.dataset.id;
+                let inputQty = document.getElementById('qty_' + id);
+                let cantPedida = parseInt(inputQty.value) || 1;
+
                 let p = {
-                    id: btn.dataset.id,
+                    id: id,
                     nombre: btn.dataset.nombre,
                     precio: parseFloat(btn.dataset.precio),
                     stock: parseInt(btn.dataset.stock)
                 };
-                agregarAlCarrito(p);
+
+                agregarAlCarrito(p, cantPedida);
+                inputQty.value = 1; // Resetear input a 1
             }
         });
 
-        function agregarAlCarrito(p) {
+        function agregarAlCarrito(p, cant) {
             let item = carrito.find(x => x.id === p.id);
-            if (p.stock <= 0) return Swal.fire('Sin Stock', 'No queda nada en estante', 'error');
+
+            if (p.stock <= 0) return Swal.fire('Sin Stock', 'No hay productos', 'error');
 
             if (item) {
-                if (item.cantidad < p.stock) item.cantidad++;
-                else return Swal.fire('Tope de Stock', 'No puedes vender más de lo que hay', 'warning');
+                if ((item.cantidad + cant) <= p.stock) {
+                    item.cantidad += cant;
+                } else {
+                    return Swal.fire('Stock Insuficiente', 'Solo quedan ' + p.stock, 'warning');
+                }
             } else {
-                carrito.push({
-                    ...p,
-                    cantidad: 1
-                });
+                if (cant <= p.stock) {
+                    carrito.push({
+                        ...p,
+                        cantidad: cant
+                    });
+                } else {
+                    return Swal.fire('Stock Insuficiente', 'No puedes agregar ' + cant, 'warning');
+                }
             }
             renderizar();
         }
@@ -252,50 +190,57 @@
             const contenedor = document.getElementById('carritoItems');
             const totalSpan = document.getElementById('totalVenta');
 
-            // Si por alguna razón no encuentra el contenedor, salimos para no romper el código
             if (!contenedor) return;
-
-            // Limpiamos el contenedor antes de volver a dibujar
             contenedor.innerHTML = '';
             total = 0;
 
             if (carrito.length === 0) {
-                contenedor.innerHTML = `
-            <div class="text-center text-muted mt-5" id="carritoVacio">
-                <i class="fas fa-shopping-basket fa-3x mb-3 opacity-25"></i>
-                <p>El carrito está vacío</p>
-            </div>`;
+                contenedor.innerHTML = '<p class="text-center mt-5 text-muted">Carrito vacío</p>';
                 totalSpan.innerText = '0.00';
                 return;
             }
 
-            // Dibujamos cada item
             carrito.forEach((item, i) => {
                 let sub = item.precio * item.cantidad;
                 total += sub;
 
-                // Creamos un DIV para cada producto
-                const div = document.createElement('div');
-                div.className = "item-carrito d-flex align-items-center justify-content-between border-bottom py-2";
-                div.innerHTML = `
-            <div style="width: 60%">
-                <div class="fw-bold text-dark" style="font-size: 0.9rem;">${item.nombre}</div>
-                <small class="text-muted">S/ ${item.precio.toFixed(2)} x ${item.cantidad}</small>
-            </div>
-            <div class="text-end" style="width: 30%">
-                <div class="fw-bold text-primary">S/ ${sub.toFixed(2)}</div>
-            </div>
-            <div style="width: 10%" class="text-end">
-                <button class="btn btn-sm text-danger p-0" onclick="quitar(${i})">
-                    <i class="fas fa-times-circle fa-lg"></i>
-                </button>
-            </div>
-        `;
-                contenedor.appendChild(div);
-            });
+                contenedor.innerHTML += `
+            <div class="item-carrito d-flex align-items-center justify-content-between border-bottom py-2">
+                <div style="width: 50%">
+                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">${item.nombre}</div>
+                    <small class="text-primary fw-bold">S/ ${item.precio.toFixed(2)}</small>
+                </div>
+                
+                <div class="d-flex align-items-center justify-content-center" style="width: 30%">
+                    <button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="cambiarCantidad(${i}, -1)">-</button>
+                    <span class="mx-2 fw-bold">${item.cantidad}</span>
+                    <button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="cambiarCantidad(${i}, 1)">+</button>
+                </div>
 
-            // Actualizamos el total al final
+                <div class="text-end" style="width: 20%">
+                    <div class="fw-bold text-dark">S/ ${sub.toFixed(2)}</div>
+                    <button class="btn btn-sm text-danger p-0" onclick="quitar(${i})">
+                        <i class="fas fa-trash-alt" style="font-size: 0.7rem;"></i>
+                    </button>
+                </div>
+            </div>`;
+            });
             totalSpan.innerText = total.toFixed(2);
+        }
+
+        // NUEVA FUNCIÓN PARA MODIFICAR DESDE EL CARRITO
+        function cambiarCantidad(index, cambio) {
+            let item = carrito[index];
+            let nuevaCantidad = item.cantidad + cambio;
+
+            if (nuevaCantidad <= 0) {
+                quitar(index);
+            } else if (nuevaCantidad > item.stock) {
+                Swal.fire('Tope de Stock', 'Solo hay ' + item.stock + ' disponibles', 'warning');
+            } else {
+                item.cantidad = nuevaCantidad;
+                renderizar();
+            }
         }
 
         function quitar(i) {
@@ -303,29 +248,30 @@
             renderizar();
         }
 
-        // El Finalizar Venta que ya tenías (pero con bloqueo de botón)
+        function quitar(i) {
+            carrito.splice(i, 1);
+            renderizar();
+        }
+
+        // Finalizar Venta
         document.getElementById('btnFinalizar').onclick = function() {
             const btn = this;
-            const personalId = document.getElementById('personal_id').value;
-            const metodoPago = document.getElementById('metodoPago').value;
-
-            if (carrito.length === 0 || !personalId) {
-                return Swal.fire('Atención', 'Carrito vacío o falta vendedor', 'warning');
-            }
+            const pId = document.getElementById('personal_id').value;
+            if (carrito.length === 0 || !pId) return Swal.fire('Error', 'Completa los datos', 'error');
 
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Procesando...';
+            btn.innerHTML = 'Procesando...';
 
             fetch("{{ route('ventas.store') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({
                         productos: carrito,
-                        personal_id: personalId,
-                        metodo_pago: metodoPago,
+                        personal_id: pId,
+                        metodo_pago: document.getElementById('metodoPago').value,
                         total: total
                     })
                 })
@@ -333,25 +279,50 @@
                 .then(data => {
                     if (data.success) {
                         Swal.fire({
-                                title: '¡Venta Exitosa!',
-                                icon: 'success',
-                                showCancelButton: true,
-                                confirmButtonText: 'Imprimir Ticket'
-                            })
-                            .then(res => {
+                            title: '¡Venta Exitosa!',
+                            text: '¿Desea imprimir el ticket de venta?',
+                            icon: 'success',
+                            showCancelButton: true, // Muestra el botón de cancelar
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: '<i class="fas fa-print"></i> Imprimir Ticket',
+                            cancelButtonText: 'Cerrar sin imprimir'
+                        }).then((result) => {
+                            // AQUÍ ESTÁ EL TRUCO: Solo si hace clic en el botón de Confirmar
+                            if (result.isConfirmed) {
                                 window.open(`/ventas/ticket/${data.venta_id}`, '_blank');
-                                location.reload();
-                            });
+                            }
+
+                            // En ambos casos (si imprimió o no), recargamos para limpiar todo
+                            location.reload();
+                        });
                     } else {
-                        Swal.fire('Error', data.message, 'error');
+                        Swal.fire('Error', data.message || 'Ocurrió un error', 'error');
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="fas fa-rocket me-2"></i> FINALIZAR Y COBRAR';
+                        btn.innerHTML = 'FINALIZAR Y COBRAR';
                     }
                 });
         };
 
         function limpiarCarrito() {
-            if (confirm('¿Limpiar todo el pedido?')) location.reload();
+            if (confirm('¿Vaciar todo?')) {
+                carrito = [];
+                renderizar();
+            }
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectVendedor = document.getElementById('personal_id');
+
+            // 1. Al cargar la página, vemos si hay un vendedor guardado
+            const vendedorGuardado = localStorage.getItem('vendedor_fijo');
+            if (vendedorGuardado) {
+                selectVendedor.value = vendedorGuardado;
+            }
+
+            // 2. Cada vez que cambien el vendedor manualmente, lo guardamos
+            selectVendedor.addEventListener('change', function() {
+                localStorage.setItem('vendedor_fijo', this.value);
+            });
+        });
     </script>
 @endpush

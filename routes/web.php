@@ -32,6 +32,7 @@ Route::get('/lista', [ListaController::class,'index'])->name('lista.index');
 Route::get('ventas',[VentaController::class,'index'])->name('ventas.index');
 Route::post('/ventas/store', [VentaController::class,'store'])->name('ventas.store');
 Route::get('/ventas/ticket/{id}', [VentaController::class, 'generarTicket'])->name('ventas.ticket');
+Route::post('/ventas/anular/{id}', [VentaController::class, 'anular'])->name('ventas.anular');
 
 Route::get('/home',[HomeController::class,'index'])->name('home.index');
 

@@ -289,6 +289,15 @@
                                                     style="font-size: 0.7rem;">
                                                     <i class="fas fa-print me-1"></i> TICKET
                                                 </button>
+                                                <form action="{{ route('ventas.anular', $v->id) }}" method="POST"
+                                                    onsubmit="return confirm('¿Seguro que quieres ANULAR esta venta? El stock regresará al inventario.')"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="btn btn-danger btn-sm rounded-pill px-3">
+                                                        <i class="fas fa-ban"></i> Anular
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @empty
